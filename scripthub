@@ -1,11 +1,11 @@
--- 🔒 Prevención de carga múltiple
+-- 🔒 Anti doble carga
 if getgenv().KTC_Loader then return end
 getgenv().KTC_Loader = true
 
--- 🛡️ Bypass Anticheat
+-- 🛡️ Bypass AntiCheat
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Client = ReplicatedStorage:FindFirstChild("Client")
+local Client = ReplicatedStorage:WaitForChild("Client")
 local genv = getgenv()
 local spoof = {}
 genv.Data = spoof 
@@ -23,6 +23,7 @@ end
 
 local mt = getrawmetatable(game)
 setreadonly(mt, false)
+
 local __index = mt.__index
 local __newindex = mt.__newindex
 local __namecall = mt.__namecall
@@ -45,94 +46,38 @@ end
 mt.__namecall = function(self, ...)
     local method = getnamecallmethod()
     local args = { ... }
+
     if not checkcaller() and self == Client and method == "FireServer" then
         local flag = args[1]
         if flag == "BodyPartSize" or flag == "BodyPartTransparency" or flag == "TransparencyCheck" then
             return
         end
     end
+
     return __namecall(self, ...)
 end
+
 setreadonly(mt, true)
 
--- ⚠️ Aviso visual
-local msg = Instance.new("TextLabel", Instance.new("ScreenGui", game.CoreGui))
-msg.Size = UDim2.new(1,0,0,60)
-msg.BackgroundColor3 = Color3.new(0,0,0)
-msg.TextColor3 = Color3.new(1,0,0)
-msg.TextScaled = true
-msg.Text = "🔥 Kenya mató al AntiCheat 🔥"
-task.delay(2, function() msg:Destroy() end)
+-- 🖤 Aviso visual
+local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
+local Frame = Instance.new("Frame", ScreenGui)
+local TextLabel = Instance.new("TextLabel", Frame)
 
--- 🧠 Fluent GUI
-local Fluent = loadstring(game:HttpGet("https://raw.githubusercontent.com/kenyathegoat88/fluent/main/ui"))()
-local Window = Fluent:CreateWindow({
-    Title = "KTC Hub | Reach System",
-    SubTitle = "by Kenya",
-    TabWidth = 160,
-    Size = UDim2.fromOffset(460, 300),
-    Acrylic = true,
-    Theme = "Darker",
-    MinimizeKey = Enum.KeyCode.LeftControl
-})
-local Tabs = {
-    Reach = Window:AddTab({ Title = "Reach", Icon = "🔪" }),
-    React = Window:AddTab({ Title = "React", Icon = "⚡" })
-}
+ScreenGui.IgnoreGuiInset = true
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+Frame.BackgroundColor3 = Color3.new(0, 0, 0)
+Frame.Size = UDim2.new(1, 0, 1, 0)
+TextLabel.Size = UDim2.new(1, 0, 1, 0)
+TextLabel.BackgroundTransparency = 1
+TextLabel.Text = "Kenya mató al AntiCheat"
+TextLabel.TextColor3 = Color3.new(1, 1, 1)
+TextLabel.TextScaled = true
+TextLabel.Font = Enum.Font.GothamBold
 
--- 📏 Reach System
-local reachEnabled = false
-local reachDistance = 5
-Tabs.Reach:AddSlider("Reach Distance", {
-    min = 2, max = 20, default = 5,
-    callback = function(val) reachDistance = val end
-})
-Tabs.Reach:AddToggle("Reach Toggle", {
-    default = false,
-    callback = function(state) reachEnabled = state end
-})
-
-game:GetService("RunService").RenderStepped:Connect(function()
-    if reachEnabled then
-        local plr = Players.LocalPlayer
-        local char = plr.Character
-        local hrp = char and char:FindFirstChild("HumanoidRootPart")
-        if not hrp then return end
-        for _, target in pairs(Players:GetPlayers()) do
-            if target ~= plr and target.Character then
-                local root = target.Character:FindFirstChild("HumanoidRootPart")
-                if root and (root.Position - hrp.Position).Magnitude < reachDistance then
-                    for _, limb in ipairs({"Right Arm", "Left Arm"}) do
-                        local part = char:FindFirstChild(limb)
-                        if part then
-                            firetouchinterest(part, root, 0)
-                            firetouchinterest(part, root, 1)
-                        end
-                    end
-                end
-            end
-        end
-    end
+task.delay(2, function()
+    ScreenGui:Destroy()
 end)
 
--- 🔁 React System
-local reactEnabled = false
-Tabs.React:AddToggle("React Toggle", {
-    default = false,
-    callback = function(state) reactEnabled = state end
-})
-game:GetService("RunService").RenderStepped:Connect(function()
-    if reactEnabled then
-        local plr = Players.LocalPlayer
-        local char = plr.Character
-        local hrp = char and char:FindFirstChild("HumanoidRootPart")
-        if not hrp then return end
-        for _, obj in pairs(workspace:GetDescendants()) do
-            if obj:IsA("BasePart") and obj.Name:lower():find("ball") then
-                if (obj.Position - hrp.Position).Magnitude < 10 then
-                    hrp.Velocity = (obj.Position - hrp.Position).Unit * 50
-                end
-            end
-        end
-    end
-end)
+-- 🟣 Cargar Fluent GUI desde URL
+loadstring(game:HttpGet("https://gist.githubusercontent.com/kenyathegoat88/afc467eb56ed9c6211ada73067b90c0a/raw/ktccHub.lua"))()
